@@ -1,16 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\v1;
 
 use App\Models\level;
 use App\Models\petugas;
 use Illuminate\Http\Request;
-use App\Http\Controllers\API\BaseController as BaseController;
 use App\Http\Controllers\Controller;
-use Facade\FlareClient\Api;
 use Illuminate\Support\Facades\Auth;
-use Validator;
-use DB;
 
 class PetugasController extends Controller
 {
@@ -31,18 +27,19 @@ class PetugasController extends Controller
             $petugas->api_token = $token;
 
             if ($petugas->save()) {
-                return response()->json([
-                    'status' => 'Success',
-                    'nama' => $petugas->nama_petugas,
-                    'token' => $token,
-                    'id_level' => $petugas->id_level,
-                ]);
-            } else {
-                return response('0');
+                $level = level::select('nama_level')->where('id_level', $petugas->id_level)->get();
+                foreach($level as $level){
+                    return response()->json([
+                        'status' => 'Success',
+                        'nama' => $petugas->nama_petugas,
+                        'token' => $token,
+                        'nama_level' => $level['nama_level'],
+                    ]);
+                }
             }
-        } else {
-            return response('0');
+            abort(400);
         }
+        abort(400);
     }
     /**
      * Display a listing of the resource.
@@ -68,10 +65,10 @@ class PetugasController extends Controller
             $result = petugas::join('level', 'petugas.id_level', '=', 'level.id_level')
             ->select('id', 'nama_petugas', 'username', 'nama_level')
             ->where('username', $request->username)->get();
-    
+
             foreach($result as $result){
             return response()->json([
-                
+
                 'id'=> $result['id'],
                 'nama_petugas'=> $result['nama_petugas'],
                 'username'=> $result['username'],
@@ -123,7 +120,7 @@ class PetugasController extends Controller
                 return response()->json([
                     'status' => 'Success',
                 ]);
-            } 
+            }
             abort(400);
         }
     }

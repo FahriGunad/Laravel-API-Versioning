@@ -38,10 +38,16 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
-            Route::prefix('api')
+
+            Route::prefix('api/v1')
                 ->middleware('api')
                 ->namespace($this->namespace)
-                ->group(base_path('routes/api.php'));
+                ->group(base_path('routes/api_v1.php'));
+
+            Route::prefix('api/v2')
+                ->middleware(['api'])
+                ->namespace($this->namespace)
+                ->group(base_path('routes/api_v2.php'));
 
             Route::middleware('web')
                 ->namespace($this->namespace)
@@ -60,4 +66,51 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
         });
     }
+
+    // /**
+    //  * Define the "api/v1" routes for the application.
+    //  *
+    //  * These routes are typically stateless.
+    //  *
+    //  * @return void
+    //  */
+    // protected function mapApiV1Routes()
+    // {
+    //     Route::prefix('api/v1')
+    //         ->middleware('api')
+    //         ->namespace($this->namespace)
+    //         ->group(base_path('routes/api_v1.php'));
+    // }
+
+
+    // /**
+    //  * Define the "api/v2" routes for the application.
+    //  *
+    //  * These routes are typically stateless.
+    //  *
+    //  * @return void
+    //  */
+    // protected function mapApiV2Routes()
+    // {
+    //     Route::prefix('api/v2')
+    //         ->middleware(['api'])
+    //         ->namespace($this->namespace)
+    //         ->group(base_path('routes/api_v2.php'));
+    // }
+
+    // /**
+    //  * Define the routes for the application.
+    //  *
+    //  * @return void
+    //  */
+    // public function map()
+    // {
+    //     $this->mapApiRoutes();
+
+    //     $this->mapWebRoutes();
+
+    //     // custom API routes
+    //     $this->mapApiV1Routes();
+    //     $this->mapApiV2Routes();
+    // }
 }
